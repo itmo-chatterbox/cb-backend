@@ -5,3 +5,6 @@ chatterbox.db
 .idea
 
 migrations
+
+
+**/__pycache__
