@@ -5,7 +5,7 @@ from fastapi import Body, FastAPI, HTTPException
 
 from pydantic import BaseModel, EmailStr
 
-from db.db import User
+from db.models.users import User
 
 app = FastAPI()
 
@@ -45,4 +45,5 @@ async def login(data: LoginDTO):
     if not password_correct:
         raise HTTPException(status_code=400, detail="User or password is not correct")
 
-    return user.email
+    return {"status": "ok"}
+    # create session
