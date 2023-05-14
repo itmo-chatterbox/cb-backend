@@ -1,2 +1,3 @@
 fastapi[all]
 peewee
+bcrypt
