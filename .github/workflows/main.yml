@@ -19,10 +19,10 @@ jobs:
         pip install black
     - name: Install project dependencies
       run: |
-        if [ -f ${{ github.head_ref }}/requirements.txt ];
+        if [ -f ./requirements.txt ];
         then
-          pip install -r ${{ github.head_ref }}/requirements.txt
+          pip install -r ./requirements.txt
         fi
     - name: Run black
       run: |
-        black -l 100 --check --diff --color ${{ github.head_ref }}
+        black -l 100 --check --diff --color .
