@@ -1,0 +1,28 @@
+name: ChatterBox
+
+on:
+  push:
+    branches:
+    - main
+    
+jobs:
+  black_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Installing Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+    - name: Installing testing dependencies
+      run: |
+        pip install black
+    - name: Install project dependencies
+      run: |
+        if [ -f ${{ github.head_ref }}/requirements.txt ];
+        then
+          pip install -r ${{ github.head_ref }}/requirements.txt
+        fi
+    - name: Run black
+      run: |
+        black -l 100 --check --diff --color ${{ github.head_ref }}
