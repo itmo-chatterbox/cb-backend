@@ -17,12 +17,6 @@ jobs:
     - name: Installing testing dependencies
       run: |
         pip install black
-    - name: Install project dependencies
-      run: |
-        if [ -f ./requirements.txt ];
-        then
-          pip install -r ./requirements.txt
-        fi
     - name: Run black
       run: |
         black -l 100 --check --diff --color .
