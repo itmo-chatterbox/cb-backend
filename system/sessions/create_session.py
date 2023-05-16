@@ -5,9 +5,9 @@ from .verifier import verifier
 from .backend import backend
 from .frontend import cookie
 
-async def create_session(name: str, response: Response):
+async def create_session(user_id: int, response: Response):
     session = uuid4()
-    data = SessionData(username=name)
+    data = SessionData(id=user_id)
 
     await backend.create(session, data)
     cookie.attach_to_response(response, session)

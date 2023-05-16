@@ -5,7 +5,7 @@ from uuid import UUID
 
 from .session_data import SessionData
 
-class BasicVerifier(SessionVerifier[UUID, SessionData]):
+class verifier(SessionVerifier[UUID, SessionData]):
     def __init__(
         self,
         *,
