@@ -46,4 +46,3 @@ async def login(data: LoginDTO):
         raise HTTPException(status_code=400, detail="User or password is not correct")
 
     return {"status": "ok"}
-    # create session
