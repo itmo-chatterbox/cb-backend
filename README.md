@@ -13,6 +13,7 @@ DB_PASS=<password of DB user>
 DB_HOST=<host of DB>
 DB_PORT=<port of DB>
 DB_NAME=<name of DB>
+SECRET_KEY=<b410ffcb40fe3f9cd37ab32dad0af9be2b30c2f379fa60e62e5c77b821a22a44>
 ```
 5. Finally! Start it with `uvicorn main:app --reload`
 6. ...
