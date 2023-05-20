@@ -1,11 +1,18 @@
 import datetime
+from uuid import UUID
 
 import bcrypt
-from fastapi import Body, FastAPI, HTTPException
+from fastapi import Body, FastAPI, HTTPException, Response, Depends
 
 from pydantic import BaseModel, EmailStr
 
 from db.models.users import User
+from system.sessions.create_session import create_session
+from system.sessions.delete_session import del_session
+from system.sessions.frontend import cookie
+from system.sessions.read_session import read_session
+from system.sessions.session_data import SessionData
+from system.sessions.verifier import verifier
 
 app = FastAPI()
 
@@ -24,17 +31,19 @@ class LoginDTO(BaseModel):
 
 
 @app.post("/signup")
-async def signup(data: SignupDTO):
+async def signup(data: SignupDTO, response: Response):
     user = User(**data.__dict__)
 
     hashed_passwd = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt())
     user.password = hashed_passwd
 
     user.save()
+    await create_session(user, response)
+    return {"status": "ok"}
 
 
 @app.post("/login")
-async def login(data: LoginDTO):
+async def login(data: LoginDTO, response: Response):
     user = User.get_or_none(User.email == data.email)
 
     if not user:
@@ -45,4 +54,15 @@ async def login(data: LoginDTO):
     if not password_correct:
         raise HTTPException(status_code=400, detail="User or password is not correct")
 
+    await create_session(user, response)
     return {"status": "ok"}
+
+
+@app.get("/whoami", dependencies=[Depends(cookie)])
+async def whoami_route(session_data: SessionData = Depends(verifier)):
+    return await read_session(session_data)
+
+
+@app.get("/logout")
+async def del_session_route(response: Response, session_id: UUID = Depends(cookie)):
+    return await del_session(response, session_id)
