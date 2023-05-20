@@ -1,5 +1,6 @@
 from fastapi_sessions.frontends.implementations import SessionCookie, CookieParameters
-from ...config import SECRET_KEY
+
+from config import SECRET_KEY
 
 cookie_params = CookieParameters()
 

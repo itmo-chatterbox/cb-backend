@@ -3,18 +3,18 @@ from fastapi_sessions.backends.implementations import InMemoryBackend
 from fastapi_sessions.session_verifier import SessionVerifier
 from uuid import UUID
 
-from .backend import backend
-from .session_data import SessionData
+from system.sessions.backend import backend
+from system.sessions.session_data import SessionData
 
 
 class BasicVerifier(SessionVerifier[UUID, SessionData]):
     def __init__(
-            self,
-            *,
-            identifier: str,
-            auto_error: bool,
-            backend: InMemoryBackend[UUID, SessionData],
-            auth_http_exception: HTTPException,
+        self,
+        *,
+        identifier: str,
+        auto_error: bool,
+        backend: InMemoryBackend[UUID, SessionData],
+        auth_http_exception: HTTPException,
     ):
         self._identifier = identifier
         self._auto_error = auto_error

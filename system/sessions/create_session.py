@@ -2,10 +2,10 @@ from uuid import uuid4
 from fastapi import Response
 
 from db.models.users import User
-from .session_data import SessionData
-from .verifier import verifier
-from .backend import backend
-from .frontend import cookie
+from system.sessions.session_data import SessionData
+from system.sessions.verifier import verifier
+from system.sessions.backend import backend
+from system.sessions.frontend import cookie
 
 
 async def create_session(user: User, response: Response):

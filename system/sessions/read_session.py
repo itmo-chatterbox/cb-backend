@@ -1,6 +1,6 @@
 from fastapi import Depends
-from .session_data import SessionData
-from .verifier import verifier
+from system.sessions.session_data import SessionData
+from system.sessions.verifier import verifier
 from db.models.users import User
 
 
