@@ -1,2 +1,7 @@
-fastapi[all]
-peewee
+fastapi[all]~=0.95.2
+peewee~=3.16.2
+bcrypt~=4.0.1
+fastapi_sessions
+pydantic~=1.10.7
+starlette~=0.27.0
+python-dotenv~=1.0.0
