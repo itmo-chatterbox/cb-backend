@@ -1,20 +1,11 @@
 from fastapi import FastAPI, Depends, Response
-
-# from uuid import UUID
-
 from authentication.auth import app as AuthApp
+from messages.messages import app as MessagesApp
 
-# from system.sessions.create_session import create_session
-# from system.sessions.read_session import whoami
-# from system.sessions.delete_session import del_session
-# from system.sessions.frontend import cookie
-# from system.sessions.verifier import verifier
-# from system.sessions.session_data import SessionData
-# import db.db
 
 app = FastAPI(title="ChatterBox Backend App")
 app.mount("/auth", AuthApp)
-
+app.mount("/messages", MessagesApp)
 
 # @app.get("/id{uid}")
 # def hello(uid: int):
