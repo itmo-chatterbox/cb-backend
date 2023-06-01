@@ -1,17 +1,7 @@
 from fastapi import FastAPI, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
-
-# from uuid import UUID
-
 from authentication.auth import app as AuthApp
-
-# from system.sessions.create_session import create_session
-# from system.sessions.read_session import whoami
-# from system.sessions.delete_session import del_session
-# from system.sessions.frontend import cookie
-# from system.sessions.verifier import verifier
-# from system.sessions.session_data import SessionData
-# import db.db
+from messages.messages import app as MessagesApp
 
 app = FastAPI(title="ChatterBox Backend App")
 
@@ -21,7 +11,9 @@ app.add_middleware(
     allow_methods=['*'],
     allow_credentials=True
 )
+
 app.mount("/auth", AuthApp)
+app.mount("/messages", MessagesApp)
 
 # @app.get("/id{uid}")
 # def hello(uid: int):
