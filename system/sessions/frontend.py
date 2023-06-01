@@ -6,7 +6,7 @@ cookie_params = CookieParameters()
 
 # Uses UUID
 cookie = SessionCookie(
-    cookie_name="cookie",
+    cookie_name="cb_token",
     identifier="general_verifier",
     auto_error=True,
     secret_key=SECRET_KEY,
