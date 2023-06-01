@@ -1,9 +1,17 @@
 from fastapi import FastAPI, Depends, Response
+from fastapi.middleware.cors import CORSMiddleware
 from authentication.auth import app as AuthApp
 from messages.messages import app as MessagesApp
 
-
 app = FastAPI(title="ChatterBox Backend App")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost:2202'],
+    allow_methods=['*'],
+    allow_credentials=True
+)
+
 app.mount("/auth", AuthApp)
 app.mount("/messages", MessagesApp)
 
