@@ -7,7 +7,7 @@ app = FastAPI(title="ChatterBox Backend App")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://localhost:2202'],
+    allow_origins=['http://localhost:2203'],
     allow_methods=['*'],
     allow_credentials=True
 )
