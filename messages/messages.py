@@ -33,8 +33,14 @@ def get_chats(user: User):
 
 def get_last_message(current_user: User, collocutor: User):
     return Message.select().where((Message.user_sender == current_user & Message.user_reciever == collocutor) | (
-                Message.user_sender == collocutor & Message.user_reciever == current_user)).order_by(
+            Message.user_sender == collocutor & Message.user_reciever == current_user)).order_by(
         Message.sending_date.desc()).get()
+
+
+def get_messages(current_user: User, collocutor: User):
+    return Message.select().where((Message.user_sender == current_user & Message.user_reciever == collocutor) | (
+            Message.user_sender == collocutor & Message.user_reciever == current_user)).order_by(
+        Message.sending_date.desc())
 
 
 @app.get("/chats", dependencies=[Depends(cookie)])
@@ -48,15 +54,32 @@ async def my_chats(session_data: SessionData = Depends(verifier)):
         result.append({
             "user_id": chat.user.id,
             "full_name": f"{chat.user.first_name} {chat.user.last_name}",
-            "photo_url": chat.user.photo_url
+            "photo_url": chat.user.photo_url,
             "last_message": (get_last_message(current_user, chat.user)).text
         })
 
     return result
 
-# @app.get("/dialogue/{collocutor_id}", dependencies=[Depends(cookie)])
-# async def my_chats(session_data: SessionData = Depends(verifier),collocutor_id):
-#     current_user = await read_session(session_data)
-#     collocutor = User.get_or_none(User.id == collocutor_id)
-#     last_message = get_last_message(current_user, collocutor)
-#     result = {"Text" : }
+
+@app.get("/dialogue/{collocutor_id}", dependencies=[Depends(cookie)])
+async def my_chats(collocutor_id: int, session_data: SessionData = Depends(verifier)):
+    current_user = await read_session(session_data)
+    collocutor = User.get_or_none(User.id == collocutor_id)
+    messages = get_messages(current_user, collocutor)
+    result = []
+    for message in messages:
+        result.append({
+            "text": message.text,
+            "full_name": f"{message.user_sender.first_name} {message.user_sender.last_name}",
+            "photo_url": message.user_sender.photo_url,
+            "sending_date": message.sending_date
+        })
+    return result
+
+
+@app.post("/dialogue/{collocutor_id}/send", dependencies=[Depends(cookie)])
+async def my_chats(collocutor_id: int, sending_text: str, session_data: SessionData = Depends(verifier)):
+    current_user = await read_session(session_data)
+    collocutor = User.get_or_none(User.id == collocutor_id)
+    Message.create(user_sender=current_user, user_reciever=collocutor, sending_date=datetime.datetime.now(),
+                   text=sending_text)
