@@ -31,6 +31,12 @@ def get_chats(user: User):
     return query_users
 
 
+def get_last_message(current_user: User, collocutor: User):
+    return Message.select().where((Message.user_sender == current_user & Message.user_reciever == collocutor) | (
+                Message.user_sender == collocutor & Message.user_reciever == current_user)).order_by(
+        Message.sending_date.desc()).get()
+
+
 @app.get("/chats", dependencies=[Depends(cookie)])
 async def my_chats(session_data: SessionData = Depends(verifier)):
     current_user = await read_session(session_data)
@@ -43,6 +49,14 @@ async def my_chats(session_data: SessionData = Depends(verifier)):
             "user_id": chat.user.id,
             "full_name": f"{chat.user.first_name} {chat.user.last_name}",
             "photo_url": chat.user.photo_url
+            "last_message": (get_last_message(current_user, chat.user)).text
         })
 
     return result
+
+# @app.get("/dialogue/{collocutor_id}", dependencies=[Depends(cookie)])
+# async def my_chats(session_data: SessionData = Depends(verifier),collocutor_id):
+#     current_user = await read_session(session_data)
+#     collocutor = User.get_or_none(User.id == collocutor_id)
+#     last_message = get_last_message(current_user, collocutor)
+#     result = {"Text" : }
