@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
 from authentication.auth import app as AuthApp
 from messages.messages import app as MessagesApp
+from editing.edit import app as EditApp
 
 app = FastAPI(title="ChatterBox Backend App")
 
@@ -14,6 +15,7 @@ app.add_middleware(
 
 app.mount("/auth", AuthApp)
 app.mount("/messages", MessagesApp)
+app.mount("/edit", EditApp)
 
 # @app.get("/id{uid}")
 # def hello(uid: int):
