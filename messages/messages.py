@@ -37,32 +37,53 @@ def find_last_message(my_id: int, collocutor_id: int):
         User.birthday.desc()).get()
 
 
-@app.get("/all", dependencies=[Depends(cookie)])
+def get_last_message(current_user: User, collocutor: User):
+    return Message.select().where((Message.user_sender == current_user & Message.user_reciever == collocutor) | (
+            Message.user_sender == collocutor & Message.user_reciever == current_user)).order_by(
+        Message.sending_date.desc()).get()
+
+
+def get_messages(current_user: User, collocutor: User):
+    return Message.select().where((Message.user_sender == current_user & Message.user_reciever == collocutor) | (
+            Message.user_sender == collocutor & Message.user_reciever == current_user)).order_by(
+        Message.sending_date.desc())
+
+
+@app.get("/chats", dependencies=[Depends(cookie)])
 async def my_chats(session_data: SessionData = Depends(verifier)):
     my_id = session_data.id
     collocutors = get_list_of_collocutors(my_id)
 
-    all_messages = []
-    photos = [
-        "https://vsegda-pomnim.com/uploads/posts/2022-04/1649647921_71-vsegda-pomnim-com-p-tsvetok-stalina-foto-76.jpg",
-        "https://rgnp.ru/wp-content/uploads/e/3/e/e3eab3bdbad62e3db10d55b956dffb2b.jpeg",
-        "https://sun9-51.userapi.com/impg/WHjC49aHsyvMlmPdpJn_68OtWkvPo_DkSqIA-g/vGqR41ewlzU.jpg?size=1280x721&quality=95&sign=58a75b2b13197253b9852e380f97bfb8&type=album",
-        "https://cdn.fishki.net/upload/post/2020/08/14/3394916/tn/ea9b59c02ad9a304f19d08990ff116e7.jpg",
-        "https://x-true.info/uploads/posts/2015-06/1434888790_d095d0bbd18cd186d0b8d0bd.jpg",
-        "https://cdn.poryadok.ru/upload/iblock/518/518e8e876e19e597c5dddcdd36e9b0ea.jpeg"]
-    for collocutor in collocutors:
-        x = {}
-        x["id"] = collocutor.id
-        x["name"] = collocutor.first_name + " " + collocutor.last_name
-        # x["photo"] = random.choice(photos)
-        last_message = find_last_message(my_id, collocutor.id)
-        x["last_message_txt"] = last_message.text
-        print(last_message.__dict__)
-        # x["sending_date"] = last_message.sending_date
-        all_messages.append(x)
-    return all_messages
+    for chat in chats:
+        result.append({
+            "user_id": chat.user.id,
+            "full_name": f"{chat.user.first_name} {chat.user.last_name}",
+            "photo_url": chat.user.photo_url,
+            "last_message": (get_last_message(current_user, chat.user)).text
+        })
 
-# @app.get("/{collocutor}", dependencies=[Depends(cookie)])
-# async def my_chats(session_data: SessionData = Depends(verifier)):
-#     my_id = session_data.id
-#     collocutor_id = collocutor
+    return result
+
+
+@app.get("/dialogue/{collocutor_id}", dependencies=[Depends(cookie)])
+async def my_chats(collocutor_id: int, session_data: SessionData = Depends(verifier)):
+    current_user = await read_session(session_data)
+    collocutor = User.get_or_none(User.id == collocutor_id)
+    messages = get_messages(current_user, collocutor)
+    result = []
+    for message in messages:
+        result.append({
+            "text": message.text,
+            "full_name": f"{message.user_sender.first_name} {message.user_sender.last_name}",
+            "photo_url": message.user_sender.photo_url,
+            "sending_date": message.sending_date
+        })
+    return result
+
+
+@app.post("/dialogue/{collocutor_id}/send", dependencies=[Depends(cookie)])
+async def my_chats(collocutor_id: int, sending_text: str, session_data: SessionData = Depends(verifier)):
+    current_user = await read_session(session_data)
+    collocutor = User.get_or_none(User.id == collocutor_id)
+    Message.create(user_sender=current_user, user_reciever=collocutor, sending_date=datetime.datetime.now(),
+                   text=sending_text)
