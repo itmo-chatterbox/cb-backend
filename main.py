@@ -3,12 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from authentication.auth import app as AuthApp
 from messages.messages import app as MessagesApp
 from editing.edit import app as EditApp
+from config import FRONTEND_URL
 
 app = FastAPI(title="ChatterBox Backend App")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://localhost:2202'],
+    allow_origins=[FRONTEND_URL],
     allow_methods=['*'],
     allow_credentials=True
 )
