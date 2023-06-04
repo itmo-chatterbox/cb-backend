@@ -1,5 +1,4 @@
 import datetime
-import random
 from uuid import UUID
 
 import bcrypt
@@ -31,29 +30,9 @@ class LoginDTO(BaseModel):
     password: str
 
 
-@app.get("/user/{id}")
-async def user_info(id: int):
-    user = User.get_or_none(User.id == id)
-
-    if user:
-        return {"status": "ok", "data": user.__dict__}
-    else:
-        return {"status": "undefined user"}
-
-
 @app.post("/signup")
 async def signup(data: SignupDTO, response: Response):
-    photos = [
-        "https://vsegda-pomnim.com/uploads/posts/2022-04/1649647921_71-vsegda-pomnim-com-p-tsvetok-stalina-foto-76.jpg",
-        "https://rgnp.ru/wp-content/uploads/e/3/e/e3eab3bdbad62e3db10d55b956dffb2b.jpeg",
-        "https://sun9-51.userapi.com/impg/WHjC49aHsyvMlmPdpJn_68OtWkvPo_DkSqIA-g/vGqR41ewlzU.jpg?size=1280x721&quality=95&sign=58a75b2b13197253b9852e380f97bfb8&type=album",
-        "https://cdn.fishki.net/upload/post/2020/08/14/3394916/tn/ea9b59c02ad9a304f19d08990ff116e7.jpg",
-        "https://x-true.info/uploads/posts/2015-06/1434888790_d095d0bbd18cd186d0b8d0bd.jpg",
-        "https://cdn.poryadok.ru/upload/iblock/518/518e8e876e19e597c5dddcdd36e9b0ea.jpeg"
-    ]
-
     user = User(**data.__dict__)
-    user.photo_url = random.choice(photos)
 
     hashed_passwd = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt())
     user.password = hashed_passwd

@@ -6,7 +6,7 @@ from db.models.users import User
 
 
 class Message(BaseModel):
-    user_sender = ForeignKeyField(User)
-    user_reciever = ForeignKeyField(User)
+    user_sender = ForeignKeyField(User, related_name="messages")
+    user_reciever = ForeignKeyField(User, related_name="messages")
     sending_date = DateField(null=False)
     text = CharField(null=False)
