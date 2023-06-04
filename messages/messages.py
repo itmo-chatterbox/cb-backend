@@ -19,16 +19,22 @@ from system.sessions.verifier import verifier
 app = FastAPI()
 
 
-def get_chats(user: User):
-    query_sender = Message.select(User).where(
-        Message.user_sender == user).join(User, on=(User.id == Message.user_reciever)).distinct()
+def get_list_of_collocutors(my_id: int):
+    my_letters = Message.select().where(Message.user_sender.id == my_id or Message.user_reciever.id == my_id)
+    collocutors = set()
+    for letter in my_letters:
+        if letter.user_sender.id == my_id:
+            collocutor = letter.user_reciever
+        else:
+            collocutor = letter.user_sender
+        collocutors.add(collocutor)
+    return collocutors
 
-    query_receiver = Message.select(User).where(
-        Message.user_reciever == user).join(User, on=(User.id == Message.user_sender)).distinct()
 
-    query_users = (query_sender | query_receiver)
-
-    return query_users
+def find_last_message(my_id: int, collocutor_id: int):
+    return Message.select().where((Message.user_sender.id == my_id and Message.user_reciever.id == collocutor_id) or (
+                Message.user_sender.id == collocutor_id and Message.user_reciever.id == my_id)).order_by(
+        User.birthday.desc()).get()
 
 
 def get_last_message(current_user: User, collocutor: User):
@@ -45,10 +51,8 @@ def get_messages(current_user: User, collocutor: User):
 
 @app.get("/chats", dependencies=[Depends(cookie)])
 async def my_chats(session_data: SessionData = Depends(verifier)):
-    current_user = await read_session(session_data)
-    chats = get_chats(current_user)
-
-    result = []
+    my_id = session_data.id
+    collocutors = get_list_of_collocutors(my_id)
 
     for chat in chats:
         result.append({
