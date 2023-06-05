@@ -45,9 +45,15 @@ async def edit_step_1(data: EditStepDTO, session_data: SessionData = Depends(ver
 
 
 @app.post("/password", dependencies=[Depends(cookie)])
-async def my_chats(data: EditPasswordDTO, session_data: SessionData = Depends(verifier)):
+async def edit_passwd(data: EditPasswordDTO, session_data: SessionData = Depends(verifier)):
     current_user = await read_session(session_data)
     passwd = data.password
     hashed_passwd = bcrypt.hashpw(passwd.encode(), bcrypt.gensalt())
     current_user.password = hashed_passwd
+    current_user.save()
+
+@app.post("/status", dependencies=[Depends(cookie)])
+async def edit_status(new_status: str, session_data: SessionData = Depends(verifier)):
+    current_user = await read_session(session_data)
+    current_user.status = new_status
     current_user.save()
