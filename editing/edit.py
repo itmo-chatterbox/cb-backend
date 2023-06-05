@@ -18,26 +18,30 @@ from system.sessions.verifier import verifier
 app = FastAPI()
 
 
-@app.get("/edit_main_data", dependencies=[Depends(cookie)])
-async def my_chats(name: str, surname: str, email_new: str, session_data: SessionData = Depends(verifier)):
+class EditStepDTO(BaseModel):
+    first_name: str
+    last_name: str
+    email: EmailStr
+    birthdate: datetime.date
+    about: str
+
+
+@app.post("/main_data", dependencies=[Depends(cookie)])
+async def edit_step_1(data: EditStepDTO, session_data: SessionData = Depends(verifier)):
     current_user = await read_session(session_data)
-    current_user.first_name = name
-    current_user.last_name = surname
-    current_user.email = email_new
-    current_user.save()
+
+    current_user.first_name = data.first_name
+    current_user.last_name = data.last_name
+    current_user.email = data.email
+    current_user.birthdate = data.birthdate
+    current_user.about = data.about
+
+    User.bulk_update([current_user], [User.first_name, User.last_name, User.email, User.birthdate, User.about])
+
+    return {"status": "ok"}
 
 
-
-@app.get("/edit_secondary_data", dependencies=[Depends(cookie)])
-async def my_chats(birth: datetime.date, about_me: str, url_new: str, session_data: SessionData = Depends(verifier)):
-    current_user = await read_session(session_data)
-    current_user.birthdate = birth
-    current_user.about = about_me
-    current_user.photo_url = url_new
-    current_user.save()
-
-
-@app.get("/edit_password", dependencies=[Depends(cookie)])
+@app.post("/edit/password", dependencies=[Depends(cookie)])
 async def my_chats(passwd: str, session_data: SessionData = Depends(verifier)):
     current_user = await read_session(session_data)
     hashed_passwd = bcrypt.hashpw(passwd.encode(), bcrypt.gensalt())
