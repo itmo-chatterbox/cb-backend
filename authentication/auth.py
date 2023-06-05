@@ -86,6 +86,12 @@ async def whoami_route(session_data: SessionData = Depends(verifier)):
     return await read_session(session_data)
 
 
+@app.get("/my_photo", dependencies=[Depends(cookie)])
+async def my_photo_route(session_data: SessionData = Depends(verifier)):
+    user = read_session(session_data)
+    return user.photo.photo_url
+
+
 @app.get("/logout")
 async def del_session_route(response: Response, session_id: UUID = Depends(cookie)):
     return await del_session(response, session_id)

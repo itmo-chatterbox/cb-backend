@@ -51,9 +51,11 @@ async def edit_passwd(data: EditPasswordDTO, session_data: SessionData = Depends
     hashed_passwd = bcrypt.hashpw(passwd.encode(), bcrypt.gensalt())
     current_user.password = hashed_passwd
     current_user.save()
+    return {"status": "ok"}
 
 @app.post("/status", dependencies=[Depends(cookie)])
 async def edit_status(new_status: str, session_data: SessionData = Depends(verifier)):
     current_user = await read_session(session_data)
     current_user.status = new_status
     current_user.save()
+    return {"status": "ok"}
