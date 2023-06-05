@@ -8,6 +8,7 @@ from fastapi import Body, FastAPI, HTTPException, Response, Depends
 from pydantic import BaseModel, EmailStr
 
 from db.models.users import User
+from db.models.photos import Photo
 from system.sessions.create_session import create_session
 from system.sessions.delete_session import del_session
 from system.sessions.frontend import cookie
@@ -53,7 +54,8 @@ async def signup(data: SignupDTO, response: Response):
     ]
 
     user = User(**data.__dict__)
-    user.photo_url = random.choice(photos)
+    user_photo = Photo.create(photo_url=random.choice(photos))
+    user.photo = user_photo
 
     hashed_passwd = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt())
     user.password = hashed_passwd

@@ -1,7 +1,7 @@
-from peewee import Model, CharField, DateField, BooleanField
+from peewee import Model, CharField, DateField, BooleanField, ForeignKeyField
 
 from db.db import BaseModel
-
+from db.models.photos import Photo
 
 class User(BaseModel):
     email = CharField(unique=True, null=False)
@@ -12,4 +12,4 @@ class User(BaseModel):
     about = CharField(null=True)
     status = CharField(null=True)
     is_verified = BooleanField(default=False)
-    photo_url = CharField(null=True)
+    photo = ForeignKeyField(Photo, related_name="photos")
