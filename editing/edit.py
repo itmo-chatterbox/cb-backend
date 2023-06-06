@@ -28,6 +28,8 @@ class EditStepDTO(BaseModel):
 class EditPasswordDTO(BaseModel):
     password: str
 
+class EditStatusDTO(BaseModel):
+    status: str
 
 @app.post("/main_data", dependencies=[Depends(cookie)])
 async def edit_step_1(data: EditStepDTO, session_data: SessionData = Depends(verifier)):
@@ -50,4 +52,10 @@ async def my_chats(data: EditPasswordDTO, session_data: SessionData = Depends(ve
     passwd = data.password
     hashed_passwd = bcrypt.hashpw(passwd.encode(), bcrypt.gensalt())
     current_user.password = hashed_passwd
+    current_user.save()
+
+@app.post("/status", dependencies=[Depends(cookie)])
+async def edit_status(data: EditStatusDTO, session_data: SessionData = Depends(verifier)):
+    current_user = await read_session(session_data)
+    current_user.status = data.status
     current_user.save()
