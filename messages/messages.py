@@ -6,6 +6,7 @@ import bcrypt
 from fastapi import Body, FastAPI, HTTPException, Response, Depends
 
 from pydantic import BaseModel, EmailStr
+from starlette.websockets import WebSocket
 
 from db.models.users import User
 from db.models.messages import Message
@@ -53,6 +54,7 @@ async def my_chats(session_data: SessionData = Depends(verifier)):
 
     return result
 
+
 @app.get("/dialogue/{collocutor_id}", dependencies=[Depends(cookie)])
 async def my_chats(collocutor_id: int, session_data: SessionData = Depends(verifier)):
     current_user = await read_session(session_data)
@@ -75,7 +77,7 @@ class SendMessageDTO(BaseModel):
 
 
 @app.post("/dialogue/{collocutor_id}/send", dependencies=[Depends(cookie)])
-async def my_chats(data:SendMessageDTO, session_data: SessionData = Depends(verifier)):
+async def my_chats(data: SendMessageDTO, session_data: SessionData = Depends(verifier)):
     current_user = await read_session(session_data)
     collocutor = User.get_or_none(User.id == data.chat)
     Message.create(user_sender=current_user, user_reciever=collocutor, sending_date=datetime.datetime.now(),
