@@ -9,6 +9,6 @@ cookie = SessionCookie(
     cookie_name="cb_token",
     identifier="general_verifier",
     auto_error=True,
-    secret_key=SECRET_KEY,
+    secret_key="DFJDJFJDSF",
     cookie_params=cookie_params,
 )

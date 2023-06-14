@@ -23,7 +23,7 @@ app = FastAPI()
 def get_messages(current_user: User, collocutor: User):
     return Message.select().where(((Message.user_sender == current_user) & (Message.user_reciever == collocutor)) | (
             (Message.user_sender == collocutor) & (Message.user_reciever == current_user))).order_by(
-        Message.sending_date)
+        Message.sending_date.asc())
 
 
 def get_chats(user: User):
@@ -80,5 +80,5 @@ class SendMessageDTO(BaseModel):
 async def my_chats(data: SendMessageDTO, session_data: SessionData = Depends(verifier)):
     current_user = await read_session(session_data)
     collocutor = User.get_or_none(User.id == data.chat)
-    Message.create(user_sender=current_user, user_reciever=collocutor, sending_date=datetime.datetime.now(),
+    Message.create(user_sender=current_user, user_reciever=collocutor, sending_date=datetime.datetime.now().timestamp(),
                    text=data.text)

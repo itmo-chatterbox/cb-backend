@@ -1,9 +1,11 @@
 import datetime
 import random
+import uuid
 from uuid import UUID
 
 import bcrypt
-from fastapi import Body, FastAPI, HTTPException, Response, Depends
+from PIL import Image
+from fastapi import Body, FastAPI, HTTPException, Response, Depends, UploadFile, File
 
 from pydantic import BaseModel, EmailStr
 
@@ -25,11 +27,14 @@ class EditStepDTO(BaseModel):
     birthdate: datetime.date
     about: str
 
+
 class EditPasswordDTO(BaseModel):
     password: str
 
+
 class EditStatusDTO(BaseModel):
     status: str
+
 
 @app.post("/main_data", dependencies=[Depends(cookie)])
 async def edit_step_1(data: EditStepDTO, session_data: SessionData = Depends(verifier)):
@@ -54,8 +59,24 @@ async def my_chats(data: EditPasswordDTO, session_data: SessionData = Depends(ve
     current_user.password = hashed_passwd
     current_user.save()
 
+
 @app.post("/status", dependencies=[Depends(cookie)])
 async def edit_status(data: EditStatusDTO, session_data: SessionData = Depends(verifier)):
     current_user = await read_session(session_data)
     current_user.status = data.status
     current_user.save()
+
+
+@app.post("/photo", dependencies=[Depends(cookie)])
+async def edit_photo(file: UploadFile = File(), session_data: SessionData = Depends(verifier)):
+    user = await read_session(session_data)
+    im = Image.open(file.file)
+    if im.mode in ("RGBA", "P"):
+        im = im.convert("RGB")
+    title = uuid.uuid4().hex
+    path = f"static/{title}.jpg"
+    im.save(f"{path}", 'JPEG', quality=50)
+    user.photo_url = f"/{path}"
+    user.save()
+    file.file.close()
+    im.close()

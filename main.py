@@ -1,8 +1,13 @@
+import os
+
 from fastapi import FastAPI, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
+
 from authentication.auth import app as AuthApp
 from messages.messages import app as MessagesApp
 from editing.edit import app as EditApp
+from users.users import app as UsersApp
 from config import FRONTEND_URL
 
 app = FastAPI(title="ChatterBox Backend App")
@@ -17,6 +22,14 @@ app.add_middleware(
 app.mount("/auth", AuthApp)
 app.mount("/messages", MessagesApp)
 app.mount("/edit", EditApp)
+app.mount("/users", UsersApp)
+
+try:
+    os.mkdir("/static")
+except:
+    pass
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # @app.get("/id{uid}")
 # def hello(uid: int):
