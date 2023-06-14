@@ -1,4 +1,5 @@
 import datetime
+import random
 from uuid import UUID
 
 import bcrypt
@@ -28,6 +29,16 @@ class SignupDTO(BaseModel):
 class LoginDTO(BaseModel):
     email: EmailStr
     password: str
+
+
+@app.get("/user/{id}")
+async def user_info(id: int):
+    user = User.get_or_none(User.id == id)
+
+    if user:
+        return {"status": "ok", "data": user.__dict__}
+    else:
+        return {"status": "undefined user"}
 
 
 @app.post("/signup")

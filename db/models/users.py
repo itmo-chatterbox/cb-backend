@@ -12,3 +12,4 @@ class User(BaseModel):
     about = CharField(null=True)
     status = CharField(null=True)
     is_verified = BooleanField(default=False)
+    photo_url = CharField(default="/static/no-photo.png")
