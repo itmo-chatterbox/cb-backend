@@ -18,12 +18,11 @@ async def user_info(id: int):
     else:
         return {"status": "undefined user"}
 
+
 @app.get("/get_by_name")
 async def users_by_name(name: str):
     # result = User.select().where(f"*{name}*" % f"{User.first_name} {User.last_name}")
-    query = (User
-             .select()
-             .where((User.first_name + ' ' + User.last_name) ** f'%{name}%'))
+    query = User.select().where((User.first_name + " " + User.last_name) ** f"%{name}%")
 
     result = [user for user in query]
     return result

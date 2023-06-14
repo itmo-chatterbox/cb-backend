@@ -46,13 +46,18 @@ async def edit_step_1(data: EditStepDTO, session_data: SessionData = Depends(ver
     current_user.birthdate = data.birthdate
     current_user.about = data.about
 
-    User.bulk_update([current_user], [User.first_name, User.last_name, User.email, User.birthdate, User.about])
+    User.bulk_update(
+        [current_user],
+        [User.first_name, User.last_name, User.email, User.birthdate, User.about],
+    )
 
     return {"status": "ok"}
 
 
 @app.post("/password", dependencies=[Depends(cookie)])
-async def my_chats(data: EditPasswordDTO, session_data: SessionData = Depends(verifier)):
+async def my_chats(
+    data: EditPasswordDTO, session_data: SessionData = Depends(verifier)
+):
     current_user = await read_session(session_data)
     passwd = data.password
     hashed_passwd = bcrypt.hashpw(passwd.encode(), bcrypt.gensalt())
@@ -61,21 +66,25 @@ async def my_chats(data: EditPasswordDTO, session_data: SessionData = Depends(ve
 
 
 @app.post("/status", dependencies=[Depends(cookie)])
-async def edit_status(data: EditStatusDTO, session_data: SessionData = Depends(verifier)):
+async def edit_status(
+    data: EditStatusDTO, session_data: SessionData = Depends(verifier)
+):
     current_user = await read_session(session_data)
     current_user.status = data.status
     current_user.save()
 
 
 @app.post("/photo", dependencies=[Depends(cookie)])
-async def edit_photo(file: UploadFile = File(), session_data: SessionData = Depends(verifier)):
+async def edit_photo(
+    file: UploadFile = File(), session_data: SessionData = Depends(verifier)
+):
     user = await read_session(session_data)
     im = Image.open(file.file)
     if im.mode in ("RGBA", "P"):
         im = im.convert("RGB")
     title = uuid.uuid4().hex
     path = f"static/{title}.jpg"
-    im.save(f"{path}", 'JPEG', quality=50)
+    im.save(f"{path}", "JPEG", quality=50)
     user.photo_url = f"/{path}"
     user.save()
     file.file.close()

@@ -8,6 +8,8 @@ from authentication.auth import app as AuthApp
 from messages.messages import app as MessagesApp
 from editing.edit import app as EditApp
 from users.users import app as UsersApp
+from wall.wall import app as WallApp
+
 from config import FRONTEND_URL
 
 app = FastAPI(title="ChatterBox Backend App")
@@ -15,14 +17,15 @@ app = FastAPI(title="ChatterBox Backend App")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[FRONTEND_URL],
-    allow_methods=['*'],
-    allow_credentials=True
+    allow_methods=["*"],
+    allow_credentials=True,
 )
 
 app.mount("/auth", AuthApp)
 app.mount("/messages", MessagesApp)
 app.mount("/edit", EditApp)
 app.mount("/users", UsersApp)
+app.mount("/wall", WallApp)
 
 try:
     os.mkdir("/static")
